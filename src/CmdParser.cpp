@@ -1,23 +1,16 @@
 #include <CmdParser.h>
 
-CmdParser::CmdParser(Serial &serial) : serial_(serial) {}
+CmdParser::CmdParser(Serial &serial, char *inputBuffer) : serial_(serial), inputBuffer_(inputBuffer) {}
 
-COMMAND CmdParser::scanCommand()
+COMMAND CmdParser::getCommand()
 {
-    //Reads command name with space.
-    // Buffer for echo or set-led command
-    char cmdBuffer[COMMAND_SIZE_MAX+1];
-    
-    //Scan until \r or full valid/invalid command
-    bool checkCR = true;
-    serial_.scan(cmdBuffer, COMMAND_SIZE_MAX+1, checkCR);
-
     static const char *cmd1 = "set-led ";
     static const char *cmd2 = "echo ";
 
-    if (strncmp(cmd1, cmdBuffer, strlen(cmd1)) == 0)
+    //Check command
+    if (strncmp(cmd1, inputBuffer_, strlen(cmd1)) == 0)
         return SETLED;
-    if (strncmp(cmd2, cmdBuffer, strlen(cmd2)) == 0)
+    if (strncmp(cmd2, inputBuffer_, strlen(cmd2)) == 0)
         return ECHO;
 
     return NOCMD;
