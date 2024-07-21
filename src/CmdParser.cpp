@@ -21,11 +21,16 @@ int CmdParser::ctoui(char c)
 int CmdParser::checkSetLedCmd()
 {
     // Not pretty but works to self made cases
+
+    /*TODO: implement with strtok - must add \0 at end of cmd.
+    for set-led only, divides, everything, then check those seperate strings by themselves
+    If strtok returns NULL no delimeter has been found.*/
+    
     char timeValueRaw[5];
     int timeValueLen = 0;
     int time = 0;
     bool crPresent = false;
-    
+
     // Check if the input lenght is above max
     if (inputLen_ > 15)
     {
