@@ -18,6 +18,20 @@ int CmdParser::ctoui(char c)
 {
     return c - (int)'0';
 }
+int CmdParser::stoui(char *s, char eos = '\0')
+{
+    int result = 0;
+    for (int i = 0; s[i] != eos; i++)
+    {
+        // Char check
+        if (s[i] < '0' || s[i] > '9')
+        {
+            return -1;
+        }
+        result = result * 10 + (s[i] - 48);
+    }
+    return result;
+}
 int CmdParser::checkSetLedCmd()
 {
     // Not pretty but works to self made cases
@@ -25,7 +39,7 @@ int CmdParser::checkSetLedCmd()
     /*TODO: implement with strtok - must add \0 at end of cmd.
     for set-led only, divides, everything, then check those seperate strings by themselves
     If strtok returns NULL no delimeter has been found.*/
-    
+
     char timeValueRaw[5];
     int timeValueLen = 0;
     int time = 0;
@@ -89,7 +103,8 @@ int CmdParser::checkSetLedCmd()
             time = time * 10 + (timeValueRaw[i] - 48);
         }
     }
-    if (time < 1 || time > 5000)
+    // Time from [1,5000)
+    if (time < 1 || time >= 5000)
     {
         return -1;
     }
@@ -100,6 +115,55 @@ int CmdParser::checkSetLedCmd()
     }
 
     // Passes checks, return 0
+    return 0;
+}
+int CmdParser::checkEchoCmd()
+{
+    // echo is checked before, get size of data and check. Returns dataSize in cstring with \0
+    // Check data size
+    char *cmdSize = std::strtok(inputBuffer_ + 4, " ,");
+    int size = stoui(cmdSize);
+    if (size < 0 || size > 300)
+    {
+        return -1;
+    }
+    // Check if <data> ends with /r
+    int indexStartData = std::strlen(cmdSize) + std::strlen("data: ,") - 1;
+    int indexEndData = indexStartData + size - 1;
+
+    if (inputBuffer_[indexEndData + 1] != '\r')
+    {
+        return -1;
+    }
+
+    // Create buffer for output string "data: <data>\r\n\0"
+    int outputBufferSize = size + 9;
+    int outputBufferCurrentIndex = 0;
+    char outputBuffer[outputBufferSize];
+    outputBuffer[outputBufferSize - 1] = '\0'; // \0 for printString
+    static const char *cmdString = "data: ";
+
+    // Add "data: " to start of output buffer
+    for (int i = 0; cmdString[i] != '\0'; i++)
+    {
+        outputBuffer[i] = cmdString[i];
+        outputBufferCurrentIndex++;
+    }
+
+    // Copy valid <data> from input buffer
+    for (int i = indexStartData; i < indexEndData + 1; i++)
+    {
+        outputBuffer[outputBufferCurrentIndex] = inputBuffer_[i];
+        outputBufferCurrentIndex++;
+    }
+    static const char *end = "\r\n\0";
+    for (size_t i = 0; i < 3; i++)
+    {
+        outputBuffer[outputBufferCurrentIndex] = end[i];
+        outputBufferCurrentIndex++;
+    }
+
+    serial_.printString(outputBuffer);
     return 0;
 }
 int CmdParser::getVariables(COMMAND cmd)
@@ -113,6 +177,7 @@ int CmdParser::getVariables(COMMAND cmd)
     case SETLED:
         return checkSetLedCmd();
     case ECHO:
+        return checkEchoCmd();
         break;
     default:
         return -1;

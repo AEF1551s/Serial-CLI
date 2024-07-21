@@ -20,12 +20,12 @@ private:
     int getVariables(COMMAND cmd);
     int ctoui(char c); // char to unsigned int
     int checkSetLedCmd();
-
+    int checkEchoCmd();
+    int stoui(char* s, char eos);
 public:
     CmdParser(Serial &serial, char *inputBuffer, int &inputLen);
-    int cmdSetLed(LedCommandData);
-    int cmdEcho();
     int readCommand();
+    
 };
 
 #endif // CMD_PARSER_H
