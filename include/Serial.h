@@ -4,8 +4,7 @@
 #include <customTypes.h>
 #include <UART2.h>
 
-#define INPUT_BUFFER_MAX 3000
-#define OUTPUT_BUFFER_MAX 3000
+#define OUTPUT_BUFFER_MAX 308
 #define COMMAND_SIZE_MAX 7 // set-led and echo
 
 class Serial
@@ -15,10 +14,12 @@ class Serial
 private:
     UART2 uart_;
     int scan(char *ptr, int len, bool cr);
-
+    int readBytes = 0;
 public:
-    int printString(const char *ptr);
+    // char inputBuffer[INPUT_BUFFER_MAX];
     Serial(UART2 &uart2);
+    int printString(const char *ptr);
+    void handleInterrupt(char input);
 };
 
 #endif // SERIAL_H

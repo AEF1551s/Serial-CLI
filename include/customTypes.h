@@ -16,5 +16,4 @@ struct LedCommandData
     int ledId;
     int timeMs;
 };
-
 #endif // CUSTOM_TYPES_H

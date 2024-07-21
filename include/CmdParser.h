@@ -10,10 +10,10 @@ class CmdParser
 {
 private:
     Serial serial_;
-    
+    char* inputBuffer_;
 public:
-    COMMAND scanCommand();
-    CmdParser(Serial &serial);
+    COMMAND getCommand();
+    CmdParser(Serial &serial, char *inputBuffer);
     int cmdSetLed(LedCommandData);
     int cmdEcho();
     int getVariables(COMMAND cmd);

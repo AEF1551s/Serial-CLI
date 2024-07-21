@@ -47,10 +47,20 @@ inline void UART2::init()
     CLEAR_BIT(USART2->CR1, USART_CR1_M);
     CLEAR_BIT(USART2->CR2, USART_CR2_STOP_0 | USART_CR2_STOP_1);
 
+    // Enable RXNE interrupts
+    interruptInit();
+
     // Enable UART;
     SET_BIT(USART2->CR1, USART_CR1_UE);
 }
-
+inline void UART2::interruptInit()
+{
+    SET_BIT(USART2->CR1, USART_CR1_RXNEIE);
+    SET_BIT(USART2->CR1, USART_CR1_IDLEIE);
+    
+    //TODO: CHECK PRIORITY
+   NVIC_EnableIRQ(USART2_IRQn);
+}
 void UART2::write(char ch)
 {
     // Make sure the transmit data register is empty
@@ -62,7 +72,7 @@ void UART2::write(char ch)
 }
 
 char UART2::read()
-{   
+{
     // Make sure the receive data register is not empty
     while (!READ_BIT(USART2->SR, USART_SR_RXNE))
         ;
@@ -70,4 +80,3 @@ char UART2::read()
     // Read receive data register
     return USART2->DR;
 }
-

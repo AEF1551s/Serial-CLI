@@ -9,7 +9,6 @@ add_executable(${PROJECT_NAME} src/main.cpp
                     src/UART2.cpp
                     src/Serial.cpp
                     src/CmdParser.cpp
-                    src/Interrupts.cpp
                     startup/startup.c
 )
 

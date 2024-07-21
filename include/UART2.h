@@ -19,6 +19,8 @@ private:
     inline void pinInit();
     // Message format 8 data bits, 1 stop bit; baudrate; full-duplex;
     inline void init();
+    inline void interruptInit();
+
 };
 
 #endif // UART2_H
