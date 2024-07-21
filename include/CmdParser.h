@@ -9,15 +9,23 @@
 class CmdParser
 {
 private:
+    // Variables
+    char *inputBuffer_;
+    int &inputLen_;
+    LedCommandData ledCommanData;
+    // Objects
     Serial serial_;
-    char* inputBuffer_;
-public:
+    // Methods
     COMMAND getCommand();
-    CmdParser(Serial &serial, char *inputBuffer);
+    int getVariables(COMMAND cmd);
+    int ctoui(char c); // char to unsigned int
+    int checkSetLedCmd();
+
+public:
+    CmdParser(Serial &serial, char *inputBuffer, int &inputLen);
     int cmdSetLed(LedCommandData);
     int cmdEcho();
-    int getVariables(COMMAND cmd);
+    int readCommand();
 };
-
 
 #endif // CMD_PARSER_H

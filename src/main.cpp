@@ -14,8 +14,9 @@
 
 // Global variables
 volatile bool inputReady = false;
-char inputBuffer[INPUT_BUFFER_MAX];
 
+char inputBuffer[INPUT_BUFFER_MAX];
+int inputLen = 0;
 // Global object declarations
 // UART2 serialUart;
 // Serial serial(serialUart);
@@ -28,7 +29,7 @@ int main()
 
     UART2 serialUart;
     Serial serial(serialUart);
-    CmdParser cmdParser(serial, inputBuffer);
+    CmdParser cmdParser(serial, inputBuffer, inputLen);
     while (true)
     {
         inputReady = false;
@@ -36,19 +37,13 @@ int main()
         while (!inputReady)
             ;
 
-        COMMAND cmd = cmdParser.getCommand();
-
-        switch (cmd)
+        if (cmdParser.readCommand() == 0)
         {
-        case SETLED:
-            serial.printString("SETLED INPUT\n");
-            break;
-        case ECHO:
-            serial.printString("ECHO INPUT\n");
-            break;
-        default:
-            serial.printString("ERROR\n");
-            break;
+            serial.printString("OK\r\n");
+        }
+        else
+        {
+            serial.printString("ERROR\r\n");
         }
     }
     return 0;
@@ -59,7 +54,7 @@ int main()
 extern "C" void USART2_IRQHandler(void)
 {
     volatile static int readBytes = 0;
-
+    inputLen = 0;
     // Data ready to be read for receive data register
     if (READ_BIT(USART2->SR, USART_SR_RXNE))
     {
@@ -67,10 +62,11 @@ extern "C" void USART2_IRQHandler(void)
         // serial.handleInterrupt(USART2->DR);
         inputBuffer[readBytes] = USART2->DR;
         readBytes++;
+        inputLen++;
     }
     if (READ_BIT(USART2->SR, USART_SR_IDLE))
     {
-        //IDLE flag is cleared by reading SR and then DR.
+        // IDLE flag is cleared by reading SR and then DR.
         readBytes = 0;
         inputReady = true;
         int temp = USART2->DR;
