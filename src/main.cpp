@@ -8,7 +8,7 @@
 #include <Serial.h>
 #include <CmdParser.h>
 
-#define INPUT_BUFFER_MAX 309 // 307 + /r
+#define INPUT_BUFFER_MAX 310 // 309 + \r + \0
 
 // System clock by default is provided by HSI = 16MHz. Changing this will generate problems in all peripherals which use AHB, APBx bus.
 
@@ -30,10 +30,12 @@ int main()
 {
 
     // Object declarations
-
     UART2 serialUart;
     Serial serial(serialUart);
     CmdParser cmdParser(serial, inputBuffer, inputLen);
+    //Varibles
+    const char* errorString = "ERROR\r\n";
+    const char* okString = "OK\r\n";
     while (true)
     {
         inputReady = false;
@@ -43,18 +45,18 @@ int main()
         // Overflow response
         if (overflow)
         {
-            serial.printString("ERROR\r\n");
+            serial.printString(errorString);
             overflow = false;
             continue;
         }
         // Command response
         if (cmdParser.readCommand() == 0)
         {
-            serial.printString("OK\r\n");
+            serial.printString(okString);
         }
         else
         {
-            serial.printString("ERROR\r\n");
+            serial.printString(errorString);
         }
     }
     return 0;
@@ -76,7 +78,7 @@ extern "C" void USART2_IRQHandler(void)
         inputLen++;
 
         // Overflow
-        if (readBytes >= INPUT_BUFFER_MAX)
+        if (readBytes >= INPUT_BUFFER_MAX-1)
         {
             // TODO: process input buffer overflow
             overflow = true;
