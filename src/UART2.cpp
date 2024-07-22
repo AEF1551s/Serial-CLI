@@ -8,8 +8,9 @@ Exception: if SolderBridge SB13 and SB14 are open, SB62 and SB63 are closed.
 Then USART2 can be used with pin PA2, PA3 for alternative purpose.
 */
 
-UART2::UART2()
+UART2::UART2(int baudrate)
 {
+    this->baudrate_ = baudrate;
     init();
 }
 
@@ -33,9 +34,10 @@ inline void UART2::init()
 
     pinInit();
 
-    // TODO: SET AS BUILD OPTION
     //  Set baudrate to 115200b/s with oversampling 16 OVER8=0 at 16MHz
-    WRITE_REG(USART2->BRR, 0x8B);
+    // WRITE_REG(USART2->BRR, 0x8B);
+    brToMantissa();
+    WRITE_REG(USART2->BRR, mantissa);
 
     // Configure transmit enable
     SET_BIT(USART2->CR1, USART_CR1_TE);
@@ -57,9 +59,9 @@ inline void UART2::interruptInit()
 {
     SET_BIT(USART2->CR1, USART_CR1_RXNEIE);
     SET_BIT(USART2->CR1, USART_CR1_IDLEIE);
-    
-    //TODO: CHECK PRIORITY
-   NVIC_EnableIRQ(USART2_IRQn);
+
+    // TODO: CHECK PRIORITY
+    NVIC_EnableIRQ(USART2_IRQn);
 }
 void UART2::write(char ch)
 {
@@ -79,4 +81,84 @@ char UART2::read()
 
     // Read receive data register
     return USART2->DR;
+}
+
+void UART2::brToMantissa()
+{
+    switch (baudrate_)
+    {
+    case 1200:
+        // DIV 833.3125
+        // 0d833 = 0x341
+        // 16*0.3125 = 0d5 = 0x5
+        mantissa = 0x3415;
+        break;
+    case 2400:
+        // DIV 416.6875
+        // 0d416 = 0x1A0
+        // 16*0.6875 = 0d11 = 0xB
+        mantissa = 0x1A0B;
+        break;
+
+    case 9600:
+        // DIV 104.1875
+        // 0d104 = 0x68
+        // 16*0.1875 = 0d3 = 0x3
+        mantissa = 0x683;
+        break;
+
+    case 19200:
+        // DIV 52.0625
+        // 0d52 = 0x34
+        // 16*0.0625 = 0d1 = 0x1
+        mantissa = 0x341;
+        break;
+
+    case 38400:
+        // DIV 26.0625
+        // 0d26 = 0x1A
+        // 16*0.0625 = 0d1 = 0x1
+        mantissa = 0x1A1;
+        break;
+
+    case 57600:
+        // DIV 17.375
+        // 0d17 = 0x11
+        // 16*0.375 = 0d6 = 0x6
+        mantissa = 0x116;
+        break;
+
+    case 115200:
+        // DIV 8.6875
+        // 0d8 = 0x8
+        // 16*0.6875 = 0d11 = 0xB
+        mantissa = 0x8B;
+        break;
+
+    case 230400:
+        // DIV 4.3125
+        // 0d4 = 0x4
+        // 16*0.3125 = 0d5 = 0x5
+        mantissa = 0x45;
+        break;
+
+    case 460800:
+        // DIV 2.1875
+        // 0d2 = 0x2
+        // 16*0.1875 = 0d3 = 0x3
+        mantissa = 0x23;
+        break;
+
+    case 921600:
+        // DIV 1.0625
+        // 0d1 = 0x1
+        // 16*0.0625 = 0d1 = 0x1
+        mantissa = 0x11;
+        break;
+
+    default:
+        // Default set as 115200
+        mantissa = 0x8B;
+        break;
+    }
 }
