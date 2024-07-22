@@ -7,13 +7,17 @@
 #include <UART2.h>
 #include <Serial.h>
 #include <CmdParser.h>
+#include <GPIO.h>
+// Build options and parser
+#include <buildOptions.h>
+#include <BuildOptionsParser.h>
 
-#define INPUT_BUFFER_MAX 310 // 309 + \r + \0
+#define INPUT_BUFFER_MAX 311 // 309 + \r + \0
 
 // System clock by default is provided by HSI = 16MHz. Changing this will generate problems in all peripherals which use AHB, APBx bus.
 
-//Response for 3000char overflow with -O0 is 260ms with 115200b/s.
-//Theoretical end of Rx is 26ms. 
+// Response for 3000char overflow with -O0 is 260ms with 115200b/s.
+// Theoretical end of Rx is 26ms.
 
 // Global variables
 volatile bool inputReady = false;
@@ -28,14 +32,29 @@ int inputLen = 0;
 // Main
 int main()
 {
-
     // Object declarations
-    UART2 serialUart;
+    BuildOptionsParser buildOptionsParser;
+
+    // Check if all options are correct.
+    int succ = 0;
+    succ += buildOptionsParser.parsePortPin(LED1PIN);
+    succ += buildOptionsParser.parsePortPin(LED2PIN);
+    succ += buildOptionsParser.parsePortPin(LED3PIN);
+    succ += buildOptionsParser.parsePortPin(LED4PIN);
+    succ += buildOptionsParser.parseBaudrate(BAUDRATE);
+    if (succ != 0)
+        return -1;
+
+    GPIO gpio(buildOptionsParser.getPin(1), buildOptionsParser.getPin(2), buildOptionsParser.getPin(3), buildOptionsParser.getPin(4));
+    gpio.initLedPins();
+    UART2 serialUart(BAUDRATE);
     Serial serial(serialUart);
     CmdParser cmdParser(serial, inputBuffer, inputLen);
-    //Varibles
-    const char* errorString = "ERROR\r\n";
-    const char* okString = "OK\r\n";
+    // Variables
+    LedCommandData ledCmdData;
+    const char *errorString = "ERROR\r\n";
+    const char *okString = "OK\r\n";
+
     while (true)
     {
         inputReady = false;
@@ -50,9 +69,11 @@ int main()
             continue;
         }
         // Command response
-        if (cmdParser.readCommand() == 0)
+        if (cmdParser.readCommand() != NOCMD)
         {
             serial.printString(okString);
+            // ledCmdData = cmdParser.getLedCmdData();
+            // Enable led pin for time
         }
         else
         {
@@ -78,7 +99,7 @@ extern "C" void USART2_IRQHandler(void)
         inputLen++;
 
         // Overflow
-        if (readBytes >= INPUT_BUFFER_MAX-1)
+        if (readBytes >= INPUT_BUFFER_MAX)
         {
             // TODO: process input buffer overflow
             overflow = true;
@@ -94,8 +115,8 @@ extern "C" void USART2_IRQHandler(void)
         inputReady = true;
         int temp = USART2->DR;
 
-        // When receiving is over and there was overflow, reset overflow in main, 
-        //input lenght and inputready here.
+        // When receiving is over and there was overflow, reset overflow in main,
+        // input lenght and inputready here.
         if (overflow == true)
         {
             inputLen = 0;
