@@ -1,6 +1,10 @@
 #if !defined(CUSTOM_TYPES_H)
 #define CUSTOM_TYPES_H
 
+// CMSIS
+#include <stm32f410rx.h>
+#include <stm32f4xx.h>
+
 // Input command types
 typedef enum COMMAND
 {
@@ -16,4 +20,13 @@ struct LedCommandData
     int ledId;
     int timeMs;
 };
+
+// GPIO port and PIN
+typedef struct LedPin
+{
+    int ledId;
+    int pin;
+    GPIO_TypeDef *GPIOx;
+} LedPin;
+
 #endif // CUSTOM_TYPES_H
