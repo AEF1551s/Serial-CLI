@@ -21,11 +21,12 @@ private:
     int ctoui(char c); // char to unsigned int
     int checkSetLedCmd();
     int checkEchoCmd();
-    int stoui(char* s, char eos);
+    int stoui(char *s, char eos = '\0');
+
 public:
     CmdParser(Serial &serial, char *inputBuffer, int &inputLen);
     int readCommand();
-    
+    LedCommandData getLedCmdData();
 };
 
 #endif // CMD_PARSER_H

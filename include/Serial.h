@@ -13,8 +13,9 @@ class Serial
 
 private:
     UART2 uart_;
-    int scan(char *ptr, int len, bool cr);
+    int scan(char *ptr, int len, bool cr = false);
     int readBytes = 0;
+
 public:
     // char inputBuffer[INPUT_BUFFER_MAX];
     Serial(UART2 &uart2);

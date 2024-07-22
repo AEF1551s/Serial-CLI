@@ -18,7 +18,7 @@ int CmdParser::ctoui(char c)
 {
     return c - (int)'0';
 }
-int CmdParser::stoui(char *s, char eos = '\0')
+int CmdParser::stoui(char *s, char eos)
 {
     int result = 0;
     for (int i = 0; s[i] != eos; i++)
@@ -189,4 +189,8 @@ int CmdParser::getVariables(COMMAND cmd)
 int CmdParser::readCommand()
 {
     return getVariables(getCommand());
+}
+LedCommandData CmdParser::getLedCmdData()
+{
+    return ledCommanData;
 }

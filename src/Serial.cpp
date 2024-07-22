@@ -42,7 +42,7 @@ void Serial::handleInterrupt(char input)
     // readBytes++;
 }
 
-int Serial::scan(char *ptr, int len, bool cr = false)
+int Serial::scan(char *ptr, int len, bool cr)
 {
     int bytesRead = 0;
     for (int i = 0; i < len; i++)
