@@ -23,7 +23,7 @@ public:
     BuildOptionsParser();
     int parsePortPin(char *s);
     int parseBaudrate(int br);
-    LedPin getPin(int ledId);
+    LedPin getLedPin(int ledId);
 };
 
 #endif // BUILD_OPTIONS_PARSER_H

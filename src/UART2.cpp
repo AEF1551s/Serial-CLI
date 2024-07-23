@@ -61,6 +61,8 @@ inline void UART2::interruptInit()
     SET_BIT(USART2->CR1, USART_CR1_IDLEIE);
 
     // TODO: CHECK PRIORITY
+    //Set priority to 92 under all used timers
+    NVIC_SetPriority(USART2_IRQn, 92);
     NVIC_EnableIRQ(USART2_IRQn);
 }
 void UART2::write(char ch)

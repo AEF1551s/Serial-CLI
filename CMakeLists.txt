@@ -46,6 +46,8 @@ add_executable(${PROJECT_NAME} src/main.cpp
                     src/CmdParser.cpp
                     src/GPIO.cpp
                     src/BuildOptionsParser.cpp
+                    src/Timer.cpp
+                    src/timerInterrupts.cpp
                     startup/startup.c
 )
 

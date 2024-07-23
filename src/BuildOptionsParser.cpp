@@ -133,13 +133,12 @@ int BuildOptionsParser::parseBaudrate(int br)
     }
 }
 
-LedPin BuildOptionsParser::getPin(int ledId)
+LedPin BuildOptionsParser::getLedPin(int ledId)
 {
     if (ledId < 1 || ledId > 4)
     {
         // Return first pin if incorrect ledId just in case;
         return ledPins[0];
     }
-
-    return ledPins[ledId];
+    return ledPins[ledId - 1];
 }

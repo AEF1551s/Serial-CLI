@@ -13,6 +13,7 @@ private:
     char *inputBuffer_;
     int &inputLen_;
     LedCommandData ledCommanData;
+    COMMAND currentCmd;
     // Objects
     Serial serial_;
     // Methods
@@ -27,6 +28,7 @@ public:
     CmdParser(Serial &serial, char *inputBuffer, int &inputLen);
     int readCommand();
     LedCommandData getLedCmdData();
+    COMMAND getCurrentCmd();
 };
 
 #endif // CMD_PARSER_H

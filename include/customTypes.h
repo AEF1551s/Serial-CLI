@@ -15,18 +15,18 @@ typedef enum COMMAND
 } COMMAND;
 
 // Set-led command data to output
-struct LedCommandData
+typedef struct LedCommandData
 {
     int ledId;
     int timeMs;
-};
+} LedCommandData;
 
 // GPIO port and PIN
 typedef struct LedPin
 {
-    int ledId;
-    int pin;
-    GPIO_TypeDef *GPIOx;
+    int ledId;           // [1,4]
+    int pin;             // [0,15]
+    GPIO_TypeDef *GPIOx; // [*GPIOA, *GPIOB, *GPIOC]
 } LedPin;
 
 #endif // CUSTOM_TYPES_H

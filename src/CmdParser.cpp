@@ -175,8 +175,10 @@ int CmdParser::getVariables(COMMAND cmd)
     switch (cmd)
     {
     case SETLED:
+        currentCmd = SETLED;
         return checkSetLedCmd();
     case ECHO:
+        currentCmd = ECHO;
         return checkEchoCmd();
         break;
     default:
@@ -193,4 +195,8 @@ int CmdParser::readCommand()
 LedCommandData CmdParser::getLedCmdData()
 {
     return ledCommanData;
+}
+COMMAND CmdParser::getCurrentCmd()
+{
+    return currentCmd;
 }

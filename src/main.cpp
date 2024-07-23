@@ -8,10 +8,13 @@
 #include <Serial.h>
 #include <CmdParser.h>
 #include <GPIO.h>
+#include <customTypes.h>
+#include <Timer.h>
 // Build options and parser
 #include <buildOptions.h>
 #include <BuildOptionsParser.h>
 
+#include <timerInterrupts.h>
 #define INPUT_BUFFER_MAX 311 // 309 + \r + \0
 
 // System clock by default is provided by HSI = 16MHz. Changing this will generate problems in all peripherals which use AHB, APBx bus.
@@ -25,9 +28,6 @@ volatile bool overflow = false;
 
 char inputBuffer[INPUT_BUFFER_MAX];
 int inputLen = 0;
-// Global object declarations
-// UART2 serialUart;
-// Serial serial(serialUart);
 
 // Main
 int main()
@@ -45,11 +45,12 @@ int main()
     if (succ != 0)
         return -1;
 
-    GPIO gpio(buildOptionsParser.getPin(1), buildOptionsParser.getPin(2), buildOptionsParser.getPin(3), buildOptionsParser.getPin(4));
-    gpio.initLedPins();
+    Timer ledTimer;
+    GPIO gpio(ledTimer, buildOptionsParser.getLedPin(1), buildOptionsParser.getLedPin(2), buildOptionsParser.getLedPin(3), buildOptionsParser.getLedPin(4));
     UART2 serialUart(BAUDRATE);
     Serial serial(serialUart);
     CmdParser cmdParser(serial, inputBuffer, inputLen);
+
     // Variables
     LedCommandData ledCmdData;
     const char *errorString = "ERROR\r\n";
@@ -69,11 +70,16 @@ int main()
             continue;
         }
         // Command response
-        if (cmdParser.readCommand() != NOCMD)
+        if (cmdParser.readCommand() != -1)
         {
             serial.printString(okString);
-            // ledCmdData = cmdParser.getLedCmdData();
             // Enable led pin for time
+            if (cmdParser.getCurrentCmd() == SETLED)
+            {
+                LedCommandData cmdData;
+                cmdData = cmdParser.getLedCmdData();
+                gpio.ledControl(true, cmdData.ledId, cmdData.timeMs);
+            }
         }
         else
         {
