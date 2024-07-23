@@ -17,6 +17,8 @@ extern "C"
     extern GPIO_TypeDef *timer6Gpio;
     extern GPIO_TypeDef *timer9Gpio;
     extern GPIO_TypeDef *timer11Gpio;
+
+    void printString(const char *ptr);
 }
 
 #endif // TIMER_INTERRUPTS_H
