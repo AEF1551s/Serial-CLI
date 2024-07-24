@@ -1,17 +1,17 @@
 # Description
-IoT coding test
-Everything in /src and /include is written in **bare-metal**.
-Serial communication, supports set-led and echo commands
-Write command `set-led 1,500` to enable LED 1 500ms, after it turns off and receive `data led-off: 1`
-All commands end with`\r`. All outputs end with `\r\n`  
-Each LED uses seperate timer to count time until it turns off.
+IoT coding test  
+Everything in /src and /include is written in **bare-metal**.  
+Serial communication, supports set-led and echo commands  
+Write command `set-led 1,500` to enable LED 1 500ms, after it turns off and receive `data led-off: 1`  
+All commands end with`\r`. All outputs end with `\r\n`   
+Each LED uses seperate timer to count time until it turns off.  
 # BUILD options  
-Select LED pins -DLEDxPIN="PxN", for example: `-DLED1PIN="PA5"`  
-Avaliable ports are A, B, C from pin 0 to 15  
+Select LED pins -DLEDxPIN="PxN", for example: `-DLED1PIN="PA5"`    
+Avaliable ports are A, B, C from pin 0 to 15   
 Select baudrate `-DBAUDRATE=115200`. Supports only standart baudrates  
 
 # BUGS  
-When first command is procceseed, led turns off imediately - TIM IRQ is called as soon as LED is turned on and TIM counter enable.
+When first command is procceseed, led turns off imediately - TIM IRQ is called as soon as LED is turned on and TIM counter enable.  
 
 
 # Prerequisites
