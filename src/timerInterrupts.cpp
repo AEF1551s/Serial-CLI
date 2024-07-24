@@ -34,7 +34,7 @@ extern "C"
             // Clear Interrupt Flag
             CLEAR_BIT(TIM5->SR, TIM_SR_UIF);
             // Send led-off: 1
-            printString("led-off: 1");
+            printString("led-off: 1\r\n");
         }
     }
     void TIM6_DAC_IRQHandler(void)
@@ -46,7 +46,7 @@ extern "C"
             CLEAR_BIT(TIM6->CR1, TIM_CR1_CEN);
             CLEAR_BIT(TIM6->SR, TIM_SR_UIF);
             // Send led-off: 2
-            printString("led-off: 2");
+            printString("led-off: 2\r\n");
 
         }
     }
@@ -59,7 +59,7 @@ extern "C"
             CLEAR_BIT(TIM9->CR1, TIM_CR1_CEN);
             CLEAR_BIT(TIM9->SR, TIM_SR_UIF);
             // Send led-off: 3
-            printString("led-off: 3");
+            printString("led-off: 3\r\n");
 
         }
     }
@@ -72,7 +72,7 @@ extern "C"
             CLEAR_BIT(TIM11->CR1, TIM_CR1_CEN);
             CLEAR_BIT(TIM11->SR, TIM_SR_UIF);
             // Send led-off: 4
-            printString("led-off: 4");
+            printString("led-off: 4\r\n");
 
         }
     }
