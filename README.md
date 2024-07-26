@@ -11,7 +11,7 @@ Avaliable ports are A, B, C from pin 0 to 15
 Select baudrate `-DBAUDRATE=115200`. Supports only standart baudrates  
 
 # BUGS  
-When first command is procceseed, led turns off imediately - TIM IRQ is called as soon as LED is turned on and TIM counter enable.  
+**FIXED** ~~When first command is procceseed, led turns off imediately - TIM IRQ is called as soon as LED is turned on and TIM counter enable.~~
 
 
 # Prerequisites
