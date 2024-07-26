@@ -12,11 +12,13 @@ Select baudrate `-DBAUDRATE=115200`. Supports only standart baudrates
 # Working examples 
 set-led and echo valid and invalid commands. 
 At the moment no bugs are found in command parsing. 
-
+<details>
+  <summary>Expand</summary>  
 <div style="display: flex; justify-content: center; align-items: flex-start; flex-wrap: wrap;">
   <img src="https://github.com/user-attachments/assets/43e50ca5-75eb-4c76-bb24-e305c988c930" alt="test_set_led">
   <img src="https://github.com/user-attachments/assets/8e87bb25-d27b-45f3-b9de-513de983afe2" alt="test_echo">
 </div>  
+</details> 
 
 # BUGS  
 **FIXED** ~~When first command is procceseed, led turns off imediately - TIM IRQ is called as soon as LED is turned on and TIM counter enable.~~
