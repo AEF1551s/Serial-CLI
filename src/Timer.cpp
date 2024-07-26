@@ -50,6 +50,12 @@ void Timer::interruptInit()
 {
     // TIM interrupts must have more priority then USART to provide turning LEDs in time
 
+    // Force interrupt. Even tough interrupts are not enabled, this forces PSC to be loaded into shadow register.
+    // Problem and solution is described in http://www.efton.sk/STM32/gotcha/g40.html
+    for (int i = 0; i < 4; i++)
+    {
+        SET_BIT(LEDTimers[i]->EGR, TIM_EGR_UG);
+    }
     //  Enable interrupts
     for (int i = 0; i < 4; i++)
     {
