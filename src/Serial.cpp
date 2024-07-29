@@ -4,19 +4,17 @@
 // Header
 #include <Serial.h>
 
-// End buffer with \0 so can use cstring functions with whole buffer if needed
 char Serial::inputBuffer[INPUT_BUFFER_MAX];
-// Serial::inputBuffer[2] = '\0';
 int Serial::inputLen = 0;
 int Serial::readBytes = 0;
 bool Serial::overflow = false;
 bool Serial::inputReady = false;
-
-// usartReg = uart_.getReg();
+USART_TypeDef *Serial::usartReg = nullptr;
 
 Serial::Serial(USART &serialUart) : uart_(serialUart)
 {
     inputBuffer[INPUT_BUFFER_MAX - 1] = '\0';
+    usartReg = uart_.getReg();
 }
 
 int Serial::printString(const char *ptr)
