@@ -15,8 +15,6 @@
 #include <buildOptions.h>
 #include <BuildOptionsParser.h>
 
-// #define INPUT_BUFFER_MAX 311 // 309 + \r + \0
-
 // System clock by default is provided by HSI = 16MHz. Changing this will generate problems in all peripherals which use AHB, APBx bus.
 
 // Response for 3000char overflow with -O0 is 260ms with 115200b/s.
