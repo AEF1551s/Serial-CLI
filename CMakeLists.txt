@@ -20,7 +20,7 @@ set(LED3PIN ${DEFAULT_LED3PIN} CACHE STRING "LED 3 output pin")
 set(LED4PIN ${DEFAULT_LED4PIN} CACHE STRING "LED 4 output pin")
 
 # Print values
-message("Pins must be [0,14]. Avaliable ports: A, B, C")
+message("Pins must be [0,15]. Avaliable ports: A, B, C")
 message(STATUS "BAUDRATE: ${BAUDRATE}")
 message(STATUS "LED1PIN: ${LED1PIN}")
 message(STATUS "LED2PIN: ${LED2PIN}")
