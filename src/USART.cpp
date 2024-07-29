@@ -12,7 +12,7 @@ USART::USART(int baudrate, USART_TypeDef *USART_REG) : baudrate_(baudrate), UART
     init();
 }
 
-inline void USART::pinInit()
+void USART::pinInit()
 {
     // Configure GPIOA 2, 3 pins for UART
     // Enable AHB1 clock for port A
@@ -25,7 +25,7 @@ inline void USART::pinInit()
     SET_BIT(GPIOA->AFR[0], GPIO_AFRL_AFRL3_0 | GPIO_AFRL_AFRL3_1 | GPIO_AFRL_AFRL3_2); // AF7 = 0b0111
 }
 
-inline void USART::init()
+void USART::init()
 {
     // Enable RCC clock
     SET_BIT(RCC->APB1ENR, RCC_APB1ENR_USART2EN);
@@ -53,12 +53,11 @@ inline void USART::init()
     // Enable UART;
     SET_BIT(USART2->CR1, USART_CR1_UE);
 }
-inline void USART::interruptInit()
+void USART::interruptInit()
 {
     SET_BIT(USART2->CR1, USART_CR1_RXNEIE);
     SET_BIT(USART2->CR1, USART_CR1_IDLEIE);
 
-    // TODO: CHECK PRIORITY
     // Set priority to 92 under all used timers
     NVIC_SetPriority(USART2_IRQn, 92);
     NVIC_EnableIRQ(USART2_IRQn);

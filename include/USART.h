@@ -20,10 +20,10 @@ public:
 private:
     USART_TypeDef* UART_REG;
     // Configure PA2 and PA3 to AF USART2 TX/RX
-    inline void pinInit();
+    void pinInit();
     // Message format 8 data bits, 1 stop bit; baudrate; full-duplex;
-    inline void init();
-    inline void interruptInit();
+    void init();
+    void interruptInit();
 };
 
 #endif // USART_H
