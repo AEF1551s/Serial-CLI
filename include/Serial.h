@@ -5,7 +5,7 @@
 #include <stm32f4xx.h>
 // USER
 #include <customTypes.h>
-#include <UART2.h>
+#include <USART.h>
 
 // DEFINES
 #define INPUT_BUFFER_MAX 311 // 309 + \r + \0
@@ -18,7 +18,7 @@ class Serial
 
 private:
     // Objects
-    UART2 uart_;
+    USART uart_;
     // Variables
     static USART_TypeDef *usartReg;
     static char inputBuffer[INPUT_BUFFER_MAX];
@@ -31,7 +31,7 @@ private:
 
 public:
     // Methods
-    Serial(UART2 &serialUart);
+    Serial(USART &serialUart);
     int printString(const char *ptr);
     static void handleInterrupt(USART_TypeDef *USART_REG); // Handles UART interrupt
     static bool getInputReady();

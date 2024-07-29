@@ -41,7 +41,7 @@ add_definitions(
 
 # The executable target
 add_executable(${PROJECT_NAME} src/main.cpp
-                    src/UART2.cpp
+                    src/USART.cpp
                     src/Serial.cpp
                     src/CmdParser.cpp
                     src/GPIO.cpp

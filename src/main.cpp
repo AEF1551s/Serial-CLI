@@ -4,7 +4,7 @@
 // STD
 #include <cstring>
 // USER
-#include <UART2.h>
+#include <USART.h>
 #include <Serial.h>
 #include <CmdParser.h>
 #include <GPIO.h>
@@ -40,7 +40,7 @@ int main()
 
     Timer ledTimer;
     GPIO gpio(ledTimer, buildOptionsParser.getLedPin(1), buildOptionsParser.getLedPin(2), buildOptionsParser.getLedPin(3), buildOptionsParser.getLedPin(4));
-    UART2 serialUart(BAUDRATE, USART2);
+    USART serialUart(BAUDRATE, USART2);
     Serial serial(serialUart);
     CmdParser cmdParser(serial);
 

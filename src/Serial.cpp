@@ -14,7 +14,7 @@ bool Serial::inputReady = false;
 
 // usartReg = uart_.getReg();
 
-Serial::Serial(UART2 &serialUart) : uart_(serialUart)
+Serial::Serial(USART &serialUart) : uart_(serialUart)
 {
     inputBuffer[INPUT_BUFFER_MAX - 1] = '\0';
 }
