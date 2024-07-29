@@ -7,10 +7,8 @@ UART2 pin config should not be changable, because of used board.
 Exception: if SolderBridge SB13 and SB14 are open, SB62 and SB63 are closed.
 Then USART2 can be used with pin PA2, PA3 for alternative purpose.
 */
-
-UART2::UART2(int baudrate)
+UART2::UART2(int baudrate, USART_TypeDef *USART_REG) : baudrate_(baudrate), UART_REG(USART_REG)
 {
-    this->baudrate_ = baudrate;
     init();
 }
 
@@ -61,7 +59,7 @@ inline void UART2::interruptInit()
     SET_BIT(USART2->CR1, USART_CR1_IDLEIE);
 
     // TODO: CHECK PRIORITY
-    //Set priority to 92 under all used timers
+    // Set priority to 92 under all used timers
     NVIC_SetPriority(USART2_IRQn, 92);
     NVIC_EnableIRQ(USART2_IRQn);
 }
@@ -163,4 +161,9 @@ void UART2::brToMantissa()
         mantissa = 0x8B;
         break;
     }
+}
+
+USART_TypeDef *UART2::getReg()
+{
+    return UART_REG;
 }

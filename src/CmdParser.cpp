@@ -1,15 +1,15 @@
 #include <CmdParser.h>
 
-CmdParser::CmdParser(Serial &serial, char *inputBuffer, int &inputLen) : serial_(serial), inputBuffer_(inputBuffer), inputLen_(inputLen) {}
+CmdParser::CmdParser(Serial &serial) : serial_(serial) {}
 
 COMMAND CmdParser::getCommand()
 {
     static const char *cmd1 = "set-led ";
     static const char *cmd2 = "echo ";
     // Check command
-    if (std::strncmp(cmd1, inputBuffer_, strlen(cmd1)) == 0)
+    if (std::strncmp(cmd1, serial_.inputBuffer, strlen(cmd1)) == 0)
         return SETLED;
-    if (std::strncmp(cmd2, inputBuffer_, strlen(cmd2)) == 0)
+    if (std::strncmp(cmd2, serial_.inputBuffer, strlen(cmd2)) == 0)
         return ECHO;
 
     return NOCMD;
@@ -46,16 +46,16 @@ int CmdParser::checkSetLedCmd()
     bool crPresent = false;
 
     // Check if the input lenght is above max
-    if (inputLen_ > 15)
+    if (serial_.inputLen > 15)
     {
         return -1;
     }
 
     // 9th place for number 1-4
-    if (inputBuffer_[8] >= '1' && inputBuffer_[8] <= '4')
+    if (serial_.inputBuffer[8] >= '1' && serial_.inputBuffer[8] <= '4')
     {
         // write led id into command data
-        ledCommanData.ledId = ctoui(inputBuffer_[8]);
+        ledCommanData.ledId = ctoui(serial_.inputBuffer[8]);
     }
     else
     {
@@ -63,13 +63,13 @@ int CmdParser::checkSetLedCmd()
     }
 
     // 10th place for ,
-    if (inputBuffer_[9] != ',')
+    if (serial_.inputBuffer[9] != ',')
     {
         return -1;
     }
 
     // 11-14 for 0-5000 +/r
-    strncpy(timeValueRaw, inputBuffer_ + 10, 5);
+    strncpy(timeValueRaw, serial_.inputBuffer + 10, 5);
     for (int i = 0; i < 5; i++)
     {
         if (timeValueRaw[i] == '\r')
@@ -121,7 +121,7 @@ int CmdParser::checkEchoCmd()
 {
     // echo is checked before, get size of data and check. Returns dataSize in cstring with \0
     // Check data size
-    char *cmdSize = std::strtok(inputBuffer_ + 4, " ,");
+    char *cmdSize = std::strtok(serial_.inputBuffer + 4, " ,");
     int size = stoui(cmdSize);
     if (size < 0 || size > 300)
     {
@@ -131,7 +131,7 @@ int CmdParser::checkEchoCmd()
     int indexStartData = std::strlen(cmdSize) + std::strlen("data: ,") - 1;
     int indexEndData = indexStartData + size - 1;
 
-    if (inputBuffer_[indexEndData + 1] != '\r')
+    if (serial_.inputBuffer[indexEndData + 1] != '\r')
     {
         return -1;
     }
@@ -153,7 +153,7 @@ int CmdParser::checkEchoCmd()
     // Copy valid <data> from input buffer
     for (int i = indexStartData; i < indexEndData + 1; i++)
     {
-        outputBuffer[outputBufferCurrentIndex] = inputBuffer_[i];
+        outputBuffer[outputBufferCurrentIndex] = serial_.inputBuffer[i];
         outputBufferCurrentIndex++;
     }
     static const char *end = "\r\n\0";

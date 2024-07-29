@@ -4,10 +4,19 @@
 // Header
 #include <Serial.h>
 
-Serial::Serial(UART2 &uart) : uart_(uart)
+// End buffer with \0 so can use cstring functions with whole buffer if needed
+char Serial::inputBuffer[INPUT_BUFFER_MAX];
+// Serial::inputBuffer[2] = '\0';
+int Serial::inputLen = 0;
+int Serial::readBytes = 0;
+bool Serial::overflow = false;
+bool Serial::inputReady = false;
+
+// usartReg = uart_.getReg();
+
+Serial::Serial(UART2 &serialUart) : uart_(serialUart)
 {
-    //End buffer with \0 so can use cstring functions with whole buffer if needed
-    // inputBuffer[INPUT_BUFFER_MAX-1] = '\0';
+    inputBuffer[INPUT_BUFFER_MAX - 1] = '\0';
 }
 
 int Serial::printString(const char *ptr)
@@ -30,17 +39,6 @@ int Serial::printString(const char *ptr)
     }
     return 0;
 }
-void Serial::handleInterrupt(char input)
-{
-    // If somone sends alot of data, system can stop because it always stays on interrupts.
-    // Possible fix: disable interrupts if buffer is overflown, display error and wait.
-    // if (readBytes >= INPUT_BUFFER_MAX)
-    //     return;
-
-    // // Write received data into buffer
-    // inputBuffer[readBytes] = input;
-    // readBytes++;
-}
 
 int Serial::scan(char *ptr, int len, bool cr)
 {
@@ -57,5 +55,68 @@ int Serial::scan(char *ptr, int len, bool cr)
     }
     return bytesRead;
 }
+// Handles Serial UART interrupt
+void Serial::handleInterrupt(USART_TypeDef *USART_REG = usartReg)
+{
+    // Data ready to be read for receive data register
+    if (READ_BIT(USART_REG->SR, USART_SR_RXNE))
+    {
+        inputReady = false;
+        inputBuffer[readBytes] = USART_REG->DR;
+        readBytes++;
 
+        // Overflow condition
+        if (readBytes >= INPUT_BUFFER_MAX)
+        {
+            overflow = true;
+            readBytes = 0;
+            inputLen = 0;
+            inputReady = false;
+        }
+
+        // If there was received data, no need to check if it is IDLE
+        return;
+    }
+    if (READ_BIT(USART_REG->SR, USART_SR_IDLE))
+    {
+        // IDLE flag is cleared by reading SR and then DR.
+        inputLen = readBytes;
+        readBytes = 0;
+        inputReady = true;
+        int temp = USART_REG->DR;
+
+        // When receiving is over and there was overflow, reset overflow in main,
+        if (overflow == true)
+        {
+            inputLen = 0;
+            readBytes = 0;
+            inputReady = true;
+        }
+    }
+}
+// Get inputReady flag
+bool Serial::getInputReady()
+{
+    return inputReady;
+}
+// Get overflow flas
+bool Serial::getOverflow()
+{
+    return overflow;
+}
+// Set inputReady flag
+void Serial::setInputReady(bool value)
+{
+    inputReady = value;
+}
+// Set overflow flag
+void Serial::setOverflow(bool value)
+{
+    overflow = value;
+}
+//  Interrupts
+extern "C" void USART2_IRQHandler(void)
+{
+    Serial::handleInterrupt(USART2);
+}
 #endif // SERIAL_CPP

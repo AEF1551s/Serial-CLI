@@ -10,8 +10,6 @@ class CmdParser
 {
 private:
     // Variables
-    char *inputBuffer_;
-    int &inputLen_;
     LedCommandData ledCommanData;
     COMMAND currentCmd;
     // Objects
@@ -25,7 +23,7 @@ private:
     int stoui(char *s, char eos = '\0');
 
 public:
-    CmdParser(Serial &serial, char *inputBuffer, int &inputLen);
+    CmdParser(Serial &serial);
     int readCommand();
     LedCommandData getLedCmdData();
     COMMAND getCurrentCmd();
