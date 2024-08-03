@@ -1,6 +1,6 @@
 #include <CmdParser.h>
 
-CmdParser::CmdParser(Serial &serial) : serial_(serial) {}
+CmdParser::CmdParser(Serial &serial, GPIO &gpio) : serial_(serial), gpio_(gpio) {}
 
 COMMAND CmdParser::getCommand()
 {
@@ -13,24 +13,6 @@ COMMAND CmdParser::getCommand()
         return ECHO;
 
     return NOCMD;
-}
-int CmdParser::ctoui(char c)
-{
-    return c - (int)'0';
-}
-int CmdParser::stoui(char *s, char eos)
-{
-    int result = 0;
-    for (int i = 0; s[i] != eos; i++)
-    {
-        // Char check
-        if (s[i] < '0' || s[i] > '9')
-        {
-            return -1;
-        }
-        result = result * 10 + (s[i] - 48);
-    }
-    return result;
 }
 int CmdParser::checkSetLedCmd()
 {
@@ -55,7 +37,7 @@ int CmdParser::checkSetLedCmd()
     if (serial_.inputBuffer[8] >= '1' && serial_.inputBuffer[8] <= '4')
     {
         // write led id into command data
-        ledCommanData.ledId = ctoui(serial_.inputBuffer[8]);
+        ledCommanData.ledId = myCtoui(serial_.inputBuffer[8]);
     }
     else
     {
@@ -104,14 +86,14 @@ int CmdParser::checkSetLedCmd()
         }
     }
     // Time from [1,5000)
-    if (time < 1 || time >= 5000)
-    {
-        return -1;
-    }
-    else
+    if (!(time < 1 || time >= 5000))
     {
         // Write time into led command data
         ledCommanData.timeMs = time;
+    }
+    else
+    {
+        return -1;
     }
 
     // Passes checks, return 0
@@ -122,7 +104,7 @@ int CmdParser::checkEchoCmd()
     // echo is checked before, get size of data and check. Returns dataSize in cstring with \0
     // Check data size
     char *cmdSize = std::strtok(serial_.inputBuffer + 4, " ,");
-    int size = stoui(cmdSize);
+    int size = myStoui(cmdSize);
     if (size < 0 || size > 300)
     {
         return -1;
@@ -139,39 +121,35 @@ int CmdParser::checkEchoCmd()
     // Create buffer for output string "data: <data>\r\n\0"
     int outputBufferSize = size + 9;
     int outputBufferCurrentIndex = 0;
-    char outputBuffer[outputBufferSize];
-    outputBuffer[outputBufferSize - 1] = '\0'; // \0 for printString
+    char tempOutputBuffer[outputBufferSize];
+    tempOutputBuffer[outputBufferSize - 1] = '\0'; // \0 for printString
     static const char *cmdString = "data: ";
 
     // Add "data: " to start of output buffer
     for (int i = 0; cmdString[i] != '\0'; i++)
     {
-        outputBuffer[i] = cmdString[i];
+        tempOutputBuffer[i] = cmdString[i];
         outputBufferCurrentIndex++;
     }
 
     // Copy valid <data> from input buffer
     for (int i = indexStartData; i < indexEndData + 1; i++)
     {
-        outputBuffer[outputBufferCurrentIndex] = serial_.inputBuffer[i];
+        tempOutputBuffer[outputBufferCurrentIndex] = serial_.inputBuffer[i];
         outputBufferCurrentIndex++;
     }
     static const char *end = "\r\n\0";
     for (size_t i = 0; i < 3; i++)
     {
-        outputBuffer[outputBufferCurrentIndex] = end[i];
+        tempOutputBuffer[outputBufferCurrentIndex] = end[i];
         outputBufferCurrentIndex++;
     }
+    outputBuffer = tempOutputBuffer;
 
-    serial_.printString(outputBuffer);
     return 0;
 }
 int CmdParser::getVariables(COMMAND cmd)
 {
-
-    char timeValueRaw[5];
-    int timeValueLen = 0;
-    int time = 0;
     switch (cmd)
     {
     case SETLED:
@@ -180,14 +158,30 @@ int CmdParser::getVariables(COMMAND cmd)
     case ECHO:
         currentCmd = ECHO;
         return checkEchoCmd();
-        break;
     default:
+        currentCmd = NOCMD;
         return -1;
     }
 
     return 0;
 }
-
+void CmdParser::executeCmd()
+{
+    switch (currentCmd)
+    {
+    case SETLED:
+        serial_.printString("OK\r\n");
+        gpio_.ledControl(true, ledCommanData.ledId, ledCommanData.timeMs);
+        break;
+    case ECHO:
+        serial_.printString(outputBuffer);
+        serial_.printString("OK\r\n");
+        break;
+    default:
+        serial_.printString("ERROR\r\n");
+        break;
+    }
+}
 int CmdParser::readCommand()
 {
     return getVariables(getCommand());

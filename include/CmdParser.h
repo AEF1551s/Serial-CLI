@@ -5,6 +5,8 @@
 
 #include <customTypes.h>
 #include <Serial.h>
+#include <GPIO.h>
+#include <myStoi.h>
 
 class CmdParser
 {
@@ -12,21 +14,22 @@ private:
     // Variables
     LedCommandData ledCommanData;
     COMMAND currentCmd;
+    char *outputBuffer;
     // Objects
     Serial serial_;
+    GPIO gpio_;
     // Methods
     COMMAND getCommand();
     int getVariables(COMMAND cmd);
-    int ctoui(char c); // char to unsigned int
     int checkSetLedCmd();
     int checkEchoCmd();
-    int stoui(char *s, char eos = '\0');
 
 public:
-    CmdParser(Serial &serial);
+    CmdParser(Serial &serial, GPIO &gpio);
     int readCommand();
     LedCommandData getLedCmdData();
     COMMAND getCurrentCmd();
+    void executeCmd();
 };
 
 #endif // CMD_PARSER_H
