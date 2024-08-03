@@ -1,17 +1,31 @@
 # Description
 IoT coding test  
 Everything in /src and /include is written in **bare-metal**.  
-Serial communication, supports set-led and echo commands  
-Write command `set-led 1,500` to enable LED 1 500ms, after it turns off and receive `data led-off: 1`  
-All commands end with`\r`. All outputs end with `\r\n`   
-Each LED uses seperate timer to count time until it turns off.  
+Serial communication, supports set-led and echo commands   
+Supports 4 LEDs  
+Each LED uses seperate timer to count time until it turns off  
+## Commands  
+All commands end with`\r`. All outputs end with `\r\n`  
+### set-led  
+Format: `set-led <led_id>,<time>\r`, where  
+`<led_id>`: ASCII string, LED number.   
+`<time>`: ASCII string, enabled state duration [1,5000). Units: milliseconds  
+Avaliable LED IDs are [1,4]  
+**Example**: Send command `set-led 1,500\r` to enable LED 1 for 500ms, after it turns off and outputs `data led-off: 1`  
+
+### echo  
+Format: `echo <len>,<data>\r`, where  
+`<len>`: ASCII string, length of the following binary data block `<data>`, range [0,300]   
+`<data>`: Binary data block   
+**Example**: Send command `echo 10,<data>`, to echo `<data>`, which are 10 octets  
+
 # BUILD options  
 Select LED pins -DLEDxPIN="PxN", for example: `-DLED1PIN="PA5"`    
 Avaliable ports are A, B, C from pin 0 to 15   
-Select baudrate `-DBAUDRATE=115200`. Supports only standart baudrates  
+Select baudrate `-DBAUDRATE=115200`. Supports only standart baudrates. Default baudrate = 115200bs  
 # Working examples 
-set-led and echo valid and invalid commands. 
-At the moment no bugs are found in command parsing. 
+set-led and echo valid and invalid commands 
+At the moment no bugs are found in command parsing   
 <details>
   <summary>Expand</summary>  
 <div style="display: flex; justify-content: center; align-items: flex-start; flex-wrap: wrap;">
