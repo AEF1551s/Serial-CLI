@@ -4,21 +4,6 @@ BuildOptionsParser::BuildOptionsParser(/* args */)
 {
 }
 
-int BuildOptionsParser::stoui(char *s, char eos)
-{
-    int result = 0;
-    for (int i = 0; s[i] != eos; i++)
-    {
-        // Char check
-        if (s[i] < '0' || s[i] > '9')
-        {
-            return -1;
-        }
-        result = result * 10 + (s[i] - 48);
-    }
-    return result;
-}
-
 int BuildOptionsParser::parsePortPin(char *s)
 {
     static int pinCount = 0;
@@ -56,7 +41,7 @@ int BuildOptionsParser::parsePortPin(char *s)
     }
 
     char *pinId = s + 2;
-    int intPinId = stoui(pinId); // Checks from PA to \0 which is pin number
+    int intPinId = myStoui(pinId); // Checks from PA to \0 which is pin number
 
     // Each port has 15 pins
     if (intPinId < 0 || intPinId > 15)

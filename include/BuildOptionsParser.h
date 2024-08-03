@@ -8,6 +8,7 @@
 #include <cstring>
 // USER
 #include <customTypes.h>
+#include <myStoi.h>
 
 class BuildOptionsParser
 {
@@ -16,7 +17,6 @@ private:
     LedPin ledPins[4];
     int baudrate;
     // Methods
-    int stoui(char *s, char eos = '\0');
     int checkPortPin(char *s);
 
 public:
