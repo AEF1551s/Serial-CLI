@@ -72,3 +72,46 @@ void GPIO::ledControl(bool state, int ledId, int timeMs)
         SET_BIT(timer_.LEDTimers[ledId - 1]->CR1, TIM_CR1_CEN);
     }
 }
+void GPIO::UART2pinInit()
+{
+    // Configure PA2 and PA3 to AF USART2 TX/RX
+    // Configure GPIOA 2, 3 pins for UART
+    // Enable AHB1 clock for port A
+    SET_BIT(RCC->AHB1ENR, RCC_AHB1ENR_GPIOAEN);
+    // Set PA2 and PA3 to AF for UART2
+    SET_BIT(GPIOA->MODER, 0b10 << GPIO_MODER_MODER2_Pos);
+    SET_BIT(GPIOA->MODER, 0b10 << GPIO_MODER_MODER3_Pos);
+    // Set AF7 (0b0111) to both pins (from Alternate Function Mapping)
+    SET_BIT(GPIOA->AFR[0], GPIO_AFRL_AFRL2_0 | GPIO_AFRL_AFRL2_1 | GPIO_AFRL_AFRL2_2); // AF7 = 0b0111
+    SET_BIT(GPIOA->AFR[0], GPIO_AFRL_AFRL3_0 | GPIO_AFRL_AFRL3_1 | GPIO_AFRL_AFRL3_2); // AF7 = 0b0111
+}
+// Based on provided port, turn on clock source
+// GPIO ports use AHB1 clock
+void enableAHB1Clock(GPIO_TypeDef *port)
+{
+    switch ((uint32_t)port)
+    {
+    case (uint32_t)GPIOA_BASE:
+        SET_BIT(RCC->AHB1ENR, RCC_AHB1ENR_GPIOAEN);
+        break;
+    case (uint32_t)GPIOB_BASE:
+        SET_BIT(RCC->AHB1ENR, RCC_AHB1ENR_GPIOBEN);
+        break;
+    case (uint32_t)GPIOC_BASE:
+        SET_BIT(RCC->AHB1ENR, RCC_AHB1ENR_GPIOCEN);
+        break;
+    default:
+        return;
+    }
+}
+/*RX PORT PIN; TX PORT PIN; RTS PORT PIN; CTS PORT PIN; CK PORT PIN */
+void GPIO::configUSARTxPins(GPIO_TypeDef *RXGPIO, int rxPin, int rxAf,
+                            GPIO_TypeDef *TXGPIO, int txPin, int txAf,
+                            GPIO_TypeDef *CKGPIO = nullptr, int ckPin = -1, int ckAf = -1,
+                            GPIO_TypeDef *RTSGPIO = nullptr, int rtsPin = -1, int rtsAf = -1,
+                            GPIO_TypeDef *CTSGPIO = nullptr, int ctsPin = -1, int ctsAf = -1)
+{
+    // Enable clock for ports
+    // Set pins to AF
+    // Set AF for pins
+}
