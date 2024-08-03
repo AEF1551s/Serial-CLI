@@ -170,15 +170,15 @@ void CmdParser::executeCmd()
     switch (currentCmd)
     {
     case SETLED:
-        serial_.printString("OK\r\n");
+        serial_.printOk();
         gpio_.ledControl(true, ledCommanData.ledId, ledCommanData.timeMs);
         break;
     case ECHO:
         serial_.printString(outputBuffer);
-        serial_.printString("OK\r\n");
+        serial_.printOk();
         break;
     default:
-        serial_.printString("ERROR\r\n");
+        serial_.printError();
         break;
     }
 }
