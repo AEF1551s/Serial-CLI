@@ -92,6 +92,14 @@ void Serial::handleInterrupt(USART_TypeDef *USART_REG = usartReg)
         }
     }
 }
+void Serial::printError()
+{
+    printString(errorString);
+}
+void Serial::printOk()
+{
+    printString(okString);
+}
 // Get inputReady flag
 bool Serial::getInputReady()
 {

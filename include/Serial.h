@@ -26,6 +26,9 @@ private:
     static int readBytes;
     static bool overflow;
     static bool inputReady;
+
+    const char *errorString = "ERROR\r\n";
+    const char *okString = "OK\r\n";
     // Methods
     int scan(char *ptr, int len, bool cr = false);
 
@@ -33,6 +36,8 @@ public:
     // Methods
     Serial(USART &serialUart);
     int printString(const char *ptr);
+    void printError();
+    void printOk();
     static void handleInterrupt(USART_TypeDef *USART_REG); // Handles UART interrupt
     static bool getInputReady();
     static bool getOverflow();
