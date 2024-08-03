@@ -40,7 +40,7 @@ int main()
     GPIO gpio(ledTimer, buildOptionsParser.getLedPin(1), buildOptionsParser.getLedPin(2), buildOptionsParser.getLedPin(3), buildOptionsParser.getLedPin(4));
     USART serialUart(BAUDRATE, USART2);
     Serial serial(serialUart);
-    CmdParser cmdParser(serial);
+    CmdParser cmdParser(serial, gpio);
 
     // Variables
     LedCommandData ledCmdData;
@@ -55,7 +55,7 @@ int main()
         while (!Serial::getInputReady())
             ;
 
-        // Overflow response
+        // Overflow response w/ if statement
         if (Serial::getOverflow())
         {
             serial.printString(errorString);
@@ -63,17 +63,16 @@ int main()
             continue;
         }
 
+        // // Overflow response w/ short-circuit evaluation
+        // while (Serial::getOverflow() && (serial.printString(errorString), Serial::setOverflow(false), true))
+        // {
+        //     continue;
+        // }
+
         // Command response
         if (cmdParser.readCommand() != -1)
         {
-            serial.printString(okString);
-            // Enable led pin for time
-            if (cmdParser.getCurrentCmd() == SETLED)
-            {
-                LedCommandData cmdData;
-                cmdData = cmdParser.getLedCmdData();
-                gpio.ledControl(true, cmdData.ledId, cmdData.timeMs);
-            }
+            cmdParser.executeCmd();
         }
         else
         {
