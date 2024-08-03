@@ -17,30 +17,30 @@ void GPIO::init()
 {
     initClock();
     initLedPins();
+    UART2pinInit();
 }
 // Initializes clock for used GPIO ports
 void GPIO::initClock()
 {
     // All GPIOx uses AHB1
-    int gpioEnableMask = 0;
+    volatile unsigned int gpioEnableMask = 0;
     for (int i = 0; i < ledCount_; i++)
     {
-        // For A, B, C ports
-        if (ledArray[i].GPIOx == GPIOA)
+        switch ((uint32_t)ledArray[i].GPIOx)
         {
-            gpioEnableMask = RCC_AHB1ENR_GPIOAEN;
-            SET_BIT(RCC->AHB1ENR, gpioEnableMask);
+        case (uint32_t)GPIOA_BASE:
+            gpioEnableMask = 1U << 0;
+            break;
+        case (uint32_t)GPIOB_BASE:
+            gpioEnableMask = 1U << 1;
+            break;
+        case (uint32_t)GPIOC_BASE:
+            gpioEnableMask = 1U << 2;
+            break;
+        default:
+            return;
         }
-        else if (ledArray[i].GPIOx == GPIOB)
-        {
-            gpioEnableMask = RCC_AHB1ENR_GPIOBEN;
-            SET_BIT(RCC->AHB1ENR, gpioEnableMask);
-        }
-        else if (ledArray[i].GPIOx == GPIOC)
-        {
-            gpioEnableMask = RCC_AHB1ENR_GPIOCEN;
-            SET_BIT(RCC->AHB1ENR, gpioEnableMask);
-        }
+        SET_BIT(RCC->AHB1ENR, gpioEnableMask);
     }
 }
 // Initializes output mode for LED pins
