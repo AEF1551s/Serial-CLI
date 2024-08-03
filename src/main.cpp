@@ -36,11 +36,6 @@ int main()
     Serial serial(serialUart);
     CmdParser cmdParser(serial, gpio);
 
-    // Variables
-    LedCommandData ledCmdData;
-    const char *errorString = "ERROR\r\n";
-    const char *okString = "OK\r\n";
-
     while (true)
     {
 
@@ -52,7 +47,7 @@ int main()
         // Overflow response w/ if statement
         if (Serial::getOverflow())
         {
-            serial.printString(errorString);
+            serial.printError();
             Serial::setOverflow(false);
             continue;
         }
@@ -70,7 +65,7 @@ int main()
         }
         else
         {
-            serial.printString(errorString);
+            serial.printError();
         }
     }
     return 0;
