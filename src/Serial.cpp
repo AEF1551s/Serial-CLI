@@ -35,7 +35,7 @@ int Serial::printString(const char *ptr)
             return 0;
         }
     }
-    return 0;
+    return -1;
 }
 
 int Serial::scan(char *ptr, int len, bool cr)
@@ -112,6 +112,7 @@ void Serial::setOverflow(bool value)
 {
     overflow = value;
 }
+
 //  Interrupts
 extern "C" void USART2_IRQHandler(void)
 {
