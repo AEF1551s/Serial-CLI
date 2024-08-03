@@ -24,13 +24,12 @@ Select LED pins -DLEDxPIN="PxN", for example: `-DLED1PIN="PA5"`
 Avaliable ports are A, B, C from pin 0 to 15   
 Select baudrate `-DBAUDRATE=115200`. Supports only standart baudrates. Default baudrate = 115200bs  
 # Working examples 
-set-led and echo valid and invalid commands 
-At the moment no bugs are found in command parsing   
+set-led and echo valid and invalid commands. At the moment no bugs are found in command parsing   
 <details>
   <summary>Expand</summary>  
 <div style="display: flex; justify-content: center; align-items: flex-start; flex-wrap: wrap;">
-  <img src="https://github.com/user-attachments/assets/43e50ca5-75eb-4c76-bb24-e305c988c930" alt="test_set_led">
-  <img src="https://github.com/user-attachments/assets/8e87bb25-d27b-45f3-b9de-513de983afe2" alt="test_echo">
+  <img src="https://github.com/user-attachments/assets/998adbb4-642b-4d80-8c60-0b1b44f3d9bc" alt="test_set_led">
+  <img src="https://github.com/user-attachments/assets/5cb9feb3-0501-4e63-8ab5-5ece0ceb7d9e" alt="test_echo">
 </div>  
 </details> 
 
