@@ -9,6 +9,7 @@
 // USER
 #include <customTypes.h>
 #include <myStoi.h>
+#include <buildOptions.h>
 
 class BuildOptionsParser
 {
@@ -24,6 +25,7 @@ public:
     int parsePortPin(char *s);
     int parseBaudrate(int br);
     LedPin getLedPin(int ledId);
+    int checkBuildOptions();
 };
 
 #endif // BUILD_OPTIONS_PARSER_H

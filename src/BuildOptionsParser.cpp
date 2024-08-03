@@ -127,3 +127,22 @@ LedPin BuildOptionsParser::getLedPin(int ledId)
     }
     return ledPins[ledId - 1];
 }
+int BuildOptionsParser::checkBuildOptions()
+{
+    // Check if all options are correct.
+    int succ = 0;
+    succ += parsePortPin(LED1PIN);
+    succ += parsePortPin(LED2PIN);
+    succ += parsePortPin(LED3PIN);
+    succ += parsePortPin(LED4PIN);
+    succ += parseBaudrate(BAUDRATE);
+
+    if (succ != 0)
+    {
+        return -1;
+    }
+    else
+    {
+        return 0;
+    }
+}

@@ -12,7 +12,6 @@
 #include <Timer.h>
 #include <timerInterrupts.h>
 // Build options and parser
-#include <buildOptions.h>
 #include <BuildOptionsParser.h>
 
 // System clock by default is provided by HSI = 16MHz. Changing this will generate problems in all peripherals which use AHB, APBx bus.
@@ -26,15 +25,10 @@ int main()
     // Object declarations
     BuildOptionsParser buildOptionsParser;
 
-    // Check if all options are correct.
-    int succ = 0;
-    succ += buildOptionsParser.parsePortPin(LED1PIN);
-    succ += buildOptionsParser.parsePortPin(LED2PIN);
-    succ += buildOptionsParser.parsePortPin(LED3PIN);
-    succ += buildOptionsParser.parsePortPin(LED4PIN);
-    succ += buildOptionsParser.parseBaudrate(BAUDRATE);
-    if (succ != 0)
+    if (buildOptionsParser.checkBuildOptions() == -1)
+    {
         return -1;
+    }
 
     Timer ledTimer;
     GPIO gpio(ledTimer, buildOptionsParser.getLedPin(1), buildOptionsParser.getLedPin(2), buildOptionsParser.getLedPin(3), buildOptionsParser.getLedPin(4));
