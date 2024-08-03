@@ -7,79 +7,81 @@ UART2 pin config should not be changable, because of used board.
 Exception: if SolderBridge SB13 and SB14 are open, SB62 and SB63 are closed.
 Then USART2 can be used with pin PA2, PA3 for alternative purpose.
 */
-USART::USART(int baudrate, USART_TypeDef *USART_REG) : baudrate_(baudrate), UART_REG(USART_REG)
+USART::USART(int baudrate, USART_TypeDef *USART_REG) : baudrate_(baudrate), USART_REG(USART_REG)
 {
     init();
-}
-
-void USART::pinInit()
-{
-    // Configure GPIOA 2, 3 pins for UART
-    // Enable AHB1 clock for port A
-    SET_BIT(RCC->AHB1ENR, RCC_AHB1ENR_GPIOAEN);
-    // Set PA2 and PA3 to AF for UART2
-    SET_BIT(GPIOA->MODER, 0b10 << GPIO_MODER_MODER2_Pos);
-    SET_BIT(GPIOA->MODER, 0b10 << GPIO_MODER_MODER3_Pos);
-    // Set AF7 (0b0111) to both pins (from Alternate Function Mapping)
-    SET_BIT(GPIOA->AFR[0], GPIO_AFRL_AFRL2_0 | GPIO_AFRL_AFRL2_1 | GPIO_AFRL_AFRL2_2); // AF7 = 0b0111
-    SET_BIT(GPIOA->AFR[0], GPIO_AFRL_AFRL3_0 | GPIO_AFRL_AFRL3_1 | GPIO_AFRL_AFRL3_2); // AF7 = 0b0111
 }
 
 void USART::init()
 {
     // Enable RCC clock
-    SET_BIT(RCC->APB1ENR, RCC_APB1ENR_USART2EN);
+    // STM32F410RB has USART1, USART2, USART6
+    switch ((uint32_t)USART_REG)
+    {
+    case (uint32_t)USART1_BASE:
+        SET_BIT(RCC->APB2ENR, RCC_APB2ENR_USART1EN);
 
-    pinInit();
+        break;
+    case (uint32_t)USART2_BASE:
+        SET_BIT(RCC->APB1ENR, RCC_APB1ENR_USART2EN);
 
-    //  Set baudrate to 115200b/s with oversampling 16 OVER8=0 at 16MHz
-    // WRITE_REG(USART2->BRR, 0x8B);
+        break;
+    case (uint32_t)USART6_BASE:
+        SET_BIT(RCC->APB2ENR, RCC_APB2ENR_USART6EN);
+        break;
+
+    default:
+        return;
+    }
+
+    //  Set baudrate with oversampling 16 OVER8=0 at 16MHz. Default = 115200b/s
     brToMantissa();
-    WRITE_REG(USART2->BRR, mantissa);
+    WRITE_REG(USART_REG->BRR, mantissa);
 
     // Configure transmit enable
-    SET_BIT(USART2->CR1, USART_CR1_TE);
+    SET_BIT(USART_REG->CR1, USART_CR1_TE);
 
     // Configure receive enable.
-    SET_BIT(USART2->CR1, USART_CR1_RE);
+    SET_BIT(USART_REG->CR1, USART_CR1_RE);
 
     // Configure start, 1 stop and 8 data bits.
-    CLEAR_BIT(USART2->CR1, USART_CR1_M);
-    CLEAR_BIT(USART2->CR2, USART_CR2_STOP_0 | USART_CR2_STOP_1);
+    CLEAR_BIT(USART_REG->CR1, USART_CR1_M);
+    CLEAR_BIT(USART_REG->CR2, USART_CR2_STOP_0 | USART_CR2_STOP_1);
 
     // Enable RXNE interrupts
     interruptInit();
 
     // Enable UART;
-    SET_BIT(USART2->CR1, USART_CR1_UE);
+    SET_BIT(USART_REG->CR1, USART_CR1_UE);
 }
 void USART::interruptInit()
 {
-    SET_BIT(USART2->CR1, USART_CR1_RXNEIE);
-    SET_BIT(USART2->CR1, USART_CR1_IDLEIE);
+    SET_BIT(USART_REG->CR1, USART_CR1_RXNEIE);
+    SET_BIT(USART_REG->CR1, USART_CR1_IDLEIE);
 
     // Set priority to 92 under all used timers
     NVIC_SetPriority(USART2_IRQn, 92);
     NVIC_EnableIRQ(USART2_IRQn);
 }
+
 void USART::write(char ch)
 {
     // Make sure the transmit data register is empty
-    while (!(READ_BIT(USART2->SR, USART_SR_TXE)))
+    while (!(READ_BIT(USART_REG->SR, USART_SR_TXE)))
         ;
 
     // Write to transmit data register
-    USART2->DR = static_cast<uint8_t>(ch);
+    USART_REG->DR = static_cast<uint8_t>(ch);
 }
 
 char USART::read()
 {
     // Make sure the receive data register is not empty
-    while (!READ_BIT(USART2->SR, USART_SR_RXNE))
+    while (!READ_BIT(USART_REG->SR, USART_SR_RXNE))
         ;
 
     // Read receive data register
-    return USART2->DR;
+    return USART_REG->DR;
 }
 
 void USART::brToMantissa()
@@ -164,5 +166,5 @@ void USART::brToMantissa()
 
 USART_TypeDef *USART::getReg()
 {
-    return UART_REG;
+    return USART_REG;
 }
