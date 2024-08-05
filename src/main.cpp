@@ -59,7 +59,7 @@ int main()
         // }
 
         // Command response
-        if (cmdParser.readCommand() != -1)
+        if (cmdParser.readCommand() == 0)
         {
             cmdParser.executeCmd();
         }
