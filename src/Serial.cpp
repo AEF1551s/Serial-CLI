@@ -20,7 +20,7 @@ Serial::Serial(USART &serialUart) : uart_(serialUart)
 int Serial::printString(const char *ptr)
 {
     int i = 0;
-    for (i = 0; i < OUTPUT_BUFFER_MAX; i++)
+    for (i = 0; i < OUTPUT_BUFFER_MAX && *ptr != '\0'; i++)
     {
         //  Make sure the transmit data register is empty
         while (!(READ_BIT(USART2->SR, USART_SR_TXE)))
@@ -28,14 +28,9 @@ int Serial::printString(const char *ptr)
 
         // Write to transmit data register
         USART2->DR = (uint8_t)((*ptr++));
-
-        // TODO: if '\0' is in string, it will take the \0 as end of string. Fix?
-        if (*ptr == '\0')
-        {
-            return 0;
-        }
     }
-    return -1;
+
+    return *ptr;
 }
 
 int Serial::scan(char *ptr, int len, bool cr)
