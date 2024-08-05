@@ -49,13 +49,13 @@ int Serial::scan(char *ptr, int len, bool cr)
     return bytesRead;
 }
 // Handles Serial UART interrupt
-void Serial::handleInterrupt(USART_TypeDef *USART_REG = usartReg)
+void Serial::handleInterrupt()
 {
     // Data ready to be read for receive data register
-    if (READ_BIT(USART_REG->SR, USART_SR_RXNE))
+    if (READ_BIT(usartReg->SR, USART_SR_RXNE))
     {
         inputReady = false;
-        inputBuffer[readBytes] = USART_REG->DR;
+        inputBuffer[readBytes] = usartReg->DR;
         readBytes++;
 
         // Overflow condition
@@ -70,13 +70,13 @@ void Serial::handleInterrupt(USART_TypeDef *USART_REG = usartReg)
         // If there was received data, no need to check if it is IDLE
         return;
     }
-    if (READ_BIT(USART_REG->SR, USART_SR_IDLE))
+    if (READ_BIT(usartReg->SR, USART_SR_IDLE))
     {
         // IDLE flag is cleared by reading SR and then DR.
         inputLen = readBytes;
         readBytes = 0;
         inputReady = true;
-        int temp = USART_REG->DR;
+        int temp = usartReg->DR;
 
         // When receiving is over and there was overflow, reset overflow in main,
         if (overflow == true)
@@ -119,6 +119,6 @@ void Serial::setOverflow(bool value)
 //  Interrupts
 extern "C" void USART2_IRQHandler(void)
 {
-    Serial::handleInterrupt(USART2);
+    Serial::handleInterrupt();
 }
 #endif // SERIAL_CPP

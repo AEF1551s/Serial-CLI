@@ -38,7 +38,7 @@ public:
     int printString(const char *ptr);
     void printError();
     void printOk();
-    static void handleInterrupt(USART_TypeDef *USART_REG); // Handles UART interrupt
+    static void handleInterrupt(); // Handles UART interrupt
     static bool getInputReady();
     static bool getOverflow();
     static void setInputReady(bool value);
